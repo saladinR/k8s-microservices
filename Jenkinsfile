@@ -19,18 +19,16 @@ pipeline {
             }
         }
 
-        // ── ÉTAPE 2 : Analyse SonarQube ──────────────────────
         stage('SonarQube Analysis') {
             steps {
                 echo '🔍 Analyse qualité du code...'
                 withSonarQubeEnv('sonarqube') {
-                    sh '''
-                        sonar-scanner \
-                          -Dsonar.projectKey=k8s-microservices \
-                          -Dsonar.projectName="K8s Microservices" \
-                          -Dsonar.sources=. \
-                          -Dsonar.exclusions=**/node_modules/**,**/k8s/**
-                    '''
+                    // Utiliser l'outil configuré dans Jenkins Tools
+                    sh "${tool 'sonar-scanner'}/bin/sonar-scanner \
+                        -Dsonar.projectKey=k8s-microservices \
+                        -Dsonar.projectName='K8s Microservices' \
+                        -Dsonar.sources=. \
+                        -Dsonar.exclusions=**/node_modules/**,**/k8s/**"
                 }
             }
         }
