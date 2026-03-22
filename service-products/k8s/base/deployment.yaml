@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-products
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-products
+  template:
+    metadata:
+      labels:
+        app: service-products
+    spec:
+      imagePullSecrets:
+      - name: nexus-secret
+      containers:
+      - name: service-products
+        image: 192.168.56.10:8082/service-products:latest
+        ports:
+        - containerPort: 3002
+        env:
+        - name: PORT
+          value: "3002"
+        - name: MONGODB_URI
+          value: "mongodb://mongo-products:27017/products-db"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 10
+          periodSeconds: 5

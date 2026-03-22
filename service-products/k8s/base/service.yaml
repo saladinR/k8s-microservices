@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-products
+spec:
+  selector:
+    app: service-products
+  ports:
+  - port: 3002
+    targetPort: 3002
+  type: ClusterIP

@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# D'où vient la base
+bases:
+- ../../base
+
+# Namespace cible
+namespace: recette
+
+# Changer uniquement l'image tag
+images:
+- name: 192.168.56.10:8082/service-users
+  newTag: latest
+
+# Patch — surcharger uniquement les replicas
+patches:
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: service-users
+    spec:
+      replicas: 1        # 1 seul replica en recette
