@@ -4,4 +4,37 @@ kind: Kustomization
 bases:
 - ../../base
 
-namespace: prod
+namespace: recette
+
+patches:
+- patch: |-
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: app-ingress
+    spec:
+      rules:
+      - host: "app.recette.local"
+        http:
+          paths:
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: service-users
+                port:
+                  number: 3001
+          - path: /api/products
+            pathType: Prefix
+            backend:
+              service:
+                name: service-products
+                port:
+                  number: 3002
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
