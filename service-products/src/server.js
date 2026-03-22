@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
@@ -7,8 +8,26 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Connexion MongoDB avec retry
+const connectDB = async () => {
+  const maxRetries = 10;
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log('✅ MongoDB connecté !');
+      break;
+    } catch (err) {
+      console.log(`⏳ Tentative ${i+1}/${maxRetries} - ${err.message}`);
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+};
+
+connectDB();
+
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', service: 'service-products' });
+  const dbStatus = mongoose.connection.readyState === 1 ? 'OK' : 'NOT_READY';
+  res.json({ status: 'OK', service: 'service-products', db: dbStatus });
 });
 
 const productRoutes = require('./routes/productRoutes');
